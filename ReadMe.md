@@ -1,5 +1,7 @@
 # Space Constellation Simulation and Analysis
 
+## Satellite Constellation and Space Debris Interaction Simulator
+
  This Python script simulates a constellation of satellites and space debris in Earth orbit. It propagates their orbits over time and calculates the miss distances between satellites and debris. The script also saves the positions of the satellites and miss distances as separate CSV files.
  
  ![SSO Constellation and Space Debris](https://github.com/ASTRONIAN/SCSA/blob/master/image/SCSA.gif)
