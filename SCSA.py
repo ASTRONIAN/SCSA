@@ -114,6 +114,7 @@ class Constellation:
             os.makedirs("output")
 
         for i, sat in enumerate(satellites):
+            print(f"Storing the satellite positions and miss distances data to {f'satellite_{i+1}.csv'}")
             with open(f"output/satellite_{i+1}.csv", "w", newline='') as csvfile:
                 csv_writer = csv.writer(csvfile)
                 csv_writer.writerow(["time", "x", "y", "z"] + [f"debris_{j+1}" for j in range(len(debris_objects))])
@@ -151,15 +152,16 @@ class ConstellationVisualizer:
             propagated_orbit = space_object.propagate(frame * u.s)
             r = propagated_orbit.r.to(u.km).value
             marker_style = '2' if isinstance(space_object, Satellite) else 'o'
-            label = f"Satellite {i+1}" if isinstance(space_object, Satellite) else f"Debris {i+1-len(self.constellation.space_objects)}"
-            self.ax.scatter(r[0], r[1], r[2], marker=marker_style, label=label)
+            s = '80' if isinstance(space_object, Satellite) else '20'
+            label = f"Satellite {i+1}" if isinstance(space_object, Satellite) else f"Debris {i+1-8}"
+            self.ax.scatter(r[0], r[1], r[2], marker=marker_style, label=label, s=int(s))
             self.ax.legend()
 
             # Store and plot previous positions
             self.previous_positions[i].append(r)
             if len(self.previous_positions[i]) > 1:
                 prev_r = np.array(self.previous_positions[i])
-                self.ax.plot(prev_r[:, 0], prev_r[:, 1], prev_r[:, 2], linestyle='dotted', alpha=0.3)
+                self.ax.plot(prev_r[:, 0], prev_r[:, 1], prev_r[:, 2], marker='.', linestyle='dotted', alpha=0.3, markersize=3)
 
         self.ax.set_xlabel("X (km)")
         self.ax.set_ylabel("Y (km)")
@@ -172,7 +174,7 @@ class ConstellationVisualizer:
     def visualize(self, propagation_duration, time_steps):
         """Visualize the constellation propagation."""
         ani = FuncAnimation(self.fig, self.update, frames=time_steps, interval=1, blit=False)
-        ani.save('image/SCSA.gif')
+        # ani.save('image/SCSA.gif')
         plt.show()
 
     def save_positions_and_distances(self, time_steps):
@@ -195,8 +197,8 @@ if __name__ == "__main__":
     constellation.create_space_debris(N_debris, debris_altitude, debris_inclination_range)
 
     # Plot constellation
-    propagation_duration = 0.1 * u.day
-    time_steps = np.linspace(0, propagation_duration.to(u.s).value, 1000)
+    propagation_duration = 1 * u.hour
+    time_steps = np.linspace(0, propagation_duration.to(u.s).value, 360)
 
     visualizer = ConstellationVisualizer(constellation)
     visualizer.visualize(propagation_duration, time_steps)
